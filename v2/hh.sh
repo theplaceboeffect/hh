@@ -3,7 +3,7 @@
 
 HH_CACHE=~/.hh.cache
 HH_CONFIG=~/.harmonyhub.config
-PYHARMONY_LIB=~/bin/lib/pyharmony
+PYHARMONY_LIB=~/.lib/pyharmony
 
 ########################################
 ## Get the pyharmony library from petele
@@ -20,7 +20,7 @@ function get_pyharmony {
 #################################################
 ## Define function to send command to harmony hub
 function send_command {
-	PYTHONPATH=$PYHARMONY_LIB python $PYHARMONY_LIB/harmony --loglevel ERROR --email $HARMONY_EMAIL --password $HARMONY_PASSWORD --harmony_ip  $HARMONY_IP --harmony_port 5222 $* ## 2> /dev/null
+	PYTHONPATH=$PYHARMONY_LIB python $PYHARMONY_LIB/harmony --loglevel ERROR --email $HARMONY_EMAIL --password $HARMONY_PASSWORD --harmony_ip  $HARMONY_IP --harmony_port 5222 $* 2> /dev/null
 }
 
 function refresh_cache {
