@@ -5,24 +5,29 @@ HH_CACHE=~/.hh.cache
 HH_CONFIG=~/.harmonyhub.config
 PYHARMONY_LIB=~/.lib/pyharmony
 
+PYHARMONY_GIT_URL=https://github.com/theplaceboeffect/pyharmony.git
+
 ########################################
 ## Get the pyharmony library from petele
 function get_pyharmony {
 	if [ ! -d $PYHARMONY_LIB ]; then
+		echo "pyharmony library not found in $PYHARMONY_LIB. Cloning from $PYHARMONY_GIT_URL"
 		LIB=$(dirname $PYHARMONY_LIB)
 		if [ ! -d $LIB ]; then mkdir -p $LIB; fi
-		pushd $LIB
-		git clone https://github.com/petele/pyharmony
-		popd
+		pushd $LIB > /dev/null
+		git clone $PYHARMONY_GIT_URL
+		popd > /dev/null
 	fi
 }
 
 #################################################
 ## Define function to send command to harmony hub
 function send_command {
-	PYTHONPATH=$PYHARMONY_LIB python $PYHARMONY_LIB/harmony --loglevel ERROR --email $HARMONY_EMAIL --password $HARMONY_PASSWORD --harmony_ip  $HARMONY_IP --harmony_port 5222 $* 2> /dev/null
+	PYTHONPATH=$PYHARMONY_LIB python $PYHARMONY_LIB/harmony --loglevel ERROR --email $HARMONY_EMAIL --password $HARMONY_PASSWORD --harmony_ip  $HARMONY_IP --harmony_port 5222 $* ##2> /dev/null
 }
 
+#################################################
+## Cache functions
 function refresh_cache {
 	send_command show_config > $HH_CACHE
 }
@@ -43,13 +48,24 @@ function update_cache {
 	fi
 
 	if [ $DIFF -ge $REFRESH_AFTER_EVERY_N_SECONDS -o ! -s $HH_CACHE  ]; then
-		echo Refreshing cache after $REFRESH_AFTER_EVERY_N_SECONDS
+		echo Refreshing cache 
 		refresh_cache
 	fi
 }
 
+#################################################
+function read_config {
+	if [ ! -f $HH_CONFIG ]; then
+		echo Configuration file "$HH_CONFIG" not found. Created an empty one.
+	else
+		source $HH_CONFIG
+	fi;
+
+}
+
+#################################################
 ## Read configuration
-source $HH_CONFIG
+read_config
 get_pyharmony
 update_cache
 
@@ -57,9 +73,6 @@ update_cache
 case $1 in
 "help" | "h" | "")		### HELP
 		grep '^".*)' $0
-
-		echo Available Activities
-		jq -c '.activity[] | { "id":.id, "label":.label}' $HH_CACHE
 		;;
 "current" | "c" )		### Show current activity
 		send_command show_current_activity | jq .label
@@ -83,10 +96,17 @@ case $1 in
 "tv" | "xb1" )			### GAME - switch to XBox One & TV
 		send_command start_activity 13197995
 		;;
-"off" )			### Turn off TV
+"off" )				### Turn off TV
 		send_command start_activity -1
 		;;
-"uninstall" )	### Remove libraries and cache
+"py")				### Run generic pyharmony command
+		shift
+		send_command $*
+		;;
+"py-activities")	### Show available activities
+		jq -c '.activity[] | { "id":.id, "label":.label}' $HH_CACHE
+		;;
+"uninstall" )			### Remove libraries and cache
 		rm -frv $PYHARMONY_LIB ~/.hh.cache
 		;;
 esac
