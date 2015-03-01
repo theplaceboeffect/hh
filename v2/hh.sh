@@ -23,7 +23,9 @@ function get_pyharmony {
 #################################################
 ## Define function to send command to harmony hub
 function send_command {
-	PYTHONPATH=$PYHARMONY_LIB python $PYHARMONY_LIB/harmony --loglevel ERROR --email $HARMONY_EMAIL --password $HARMONY_PASSWORD --harmony_ip  $HARMONY_IP --harmony_port 5222 $* ##2> /dev/null
+	PYTHONPATH=$PYHARMONY_LIB python $PYHARMONY_LIB/harmony --loglevel CRITICAL\
+									 --email $HARMONY_EMAIL --password $HARMONY_PASSWORD\
+									 --harmony_ip  $HARMONY_IP --harmony_port 5222 $* ##2> /dev/null
 }
 
 #################################################
@@ -108,12 +110,20 @@ case $1 in
 		;;
 "py")				### Run generic pyharmony command
 		shift
-		send_command $*
+		if [ "$#" -eq 0 ]; then
+			send_command -h
+		else
+			send_command $*
+		fi
 		;;
 "py-activities")		### Show available activities
 		jq -c '.activity[] | { "id":.id, "label":.label}' $HH_CACHE
 		;;
+"install" )			### Remove libraries and cache
+		ln -s $PWD/hh.sh ~/bin/hh
+		;;
 "uninstall" )			### Remove libraries and cache
 		rm -frv $PYHARMONY_LIB ~/.hh.cache
+		rm -f ~/bin/hh
 		;;
 esac
