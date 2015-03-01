@@ -57,6 +57,13 @@ function update_cache {
 function read_config {
 	if [ ! -f $HH_CONFIG ]; then
 		echo Configuration file "$HH_CONFIG" not found. Created an empty one.
+cat << EOF > $HH_CONFIG
+HARMONY_EMAIL=enter your harmony email here
+HARMONY_PASSWORD=enter the password
+HARMONY_IP=xxx.xxx.xxx.xxx
+HARMONY_PORT=5222
+EOF
+
 	else
 		source $HH_CONFIG
 	fi;
@@ -103,7 +110,7 @@ case $1 in
 		shift
 		send_command $*
 		;;
-"py-activities")	### Show available activities
+"py-activities")		### Show available activities
 		jq -c '.activity[] | { "id":.id, "label":.label}' $HH_CACHE
 		;;
 "uninstall" )			### Remove libraries and cache
