@@ -123,7 +123,11 @@ case $1 in
 		jq -c '.device[] | { "id":.id, "label":.label}' $HH_CACHE
 		;;
 "install" )			### Remove libraries and cache
-		ln -s $PWD/hh.sh ~/bin/hh
+		BIN_HH=~/bin/hh
+		echo "Installing ..."
+		/bin/rm -f $BIN_HH
+		ln -s $PWD/hh.sh $BIN_HH
+		ls -l $BIN_HH
 		;;
 "uninstall" )			### Remove libraries and cache
 		rm -frv $PYHARMONY_LIB ~/.hh.cache
