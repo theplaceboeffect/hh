@@ -1,7 +1,7 @@
 #!/bin/bash
 ### Requires pyharmony from http://github.com/petele/pyharmony
 
-HH_CACHE=~/.hh.cache
+HH_CACHE=~/.hh.cache.json
 HH_CONFIG=~/.harmonyhub.config
 PYHARMONY_LIB=~/.lib/pyharmony
 
@@ -116,8 +116,11 @@ case $1 in
 			send_command $*
 		fi
 		;;
-"py-activities")		### Show available activities
+"info")		### Show available activities, devices and commands
+		echo "---- Activities ---"
 		jq -c '.activity[] | { "id":.id, "label":.label}' $HH_CACHE
+		echo "---- Devices ---"
+		jq -c '.device[] | { "id":.id, "label":.label}' $HH_CACHE
 		;;
 "install" )			### Remove libraries and cache
 		ln -s $PWD/hh.sh ~/bin/hh
@@ -126,4 +129,6 @@ case $1 in
 		rm -frv $PYHARMONY_LIB ~/.hh.cache
 		rm -f ~/bin/hh
 		;;
+$*)	## Pass command to harmony
+		send_command $*
 esac
