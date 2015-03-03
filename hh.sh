@@ -116,11 +116,33 @@ case $1 in
 			send_command $*
 		fi
 		;;
-"info")		### Show available activities, devices and commands
+"info")				### Summar info
 		echo "---- Activities ---"
 		jq -c '.activity[] | { "id":.id, "label":.label}' $HH_CACHE
 		echo "---- Devices ---"
 		jq -c '.device[] | { "id":.id, "label":.label}' $HH_CACHE
+		;;
+"activities")		### Show available activities and commands
+		echo "---- Activities ---"
+		jq -c '.activity[] | { "id":.id, "label":.label}' $HH_CACHE
+		echo "---- Commands ----"
+		if [ "$2" == "" ]; then
+			jq -C '.activity[] |  "---- " + .label + " ----", .controlGroup[].function[].name' $HH_CACHE
+		else
+			jq -C '.activity[] | select(.label == "'$2'") | "---- " + .label + " ----", .controlGroup[].function[].name' $HH_CACHE
+		fi
+		;;
+"devices")			## Show devices and device commands
+		echo "---- Devices ---"
+		jq -c '.device[] | { "id":.id, "label":.label}' $HH_CACHE
+		if [ "$2" == "" ]; then
+			jq -C '.device[] |  "---- " + .label + " ----", .controlGroup[].function[].name' $HH_CACHE
+		else
+			jq -C '.device[] | select(.label == "'$2'") | "---- " + .label + " ----", .controlGroup[].function[].name' $HH_CACHE
+		fi
+		;;
+"send" )			### Send a command to device
+		send_command send_command --device $2 --command $3
 		;;
 "install" )			### Remove libraries and cache
 		BIN_HH=~/bin/hh

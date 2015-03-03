@@ -1,2 +1,9 @@
 Start Xbox One: ./run_command.sh start_activity 13197995
 Start PS4: ./run_command.sh start_activity 13198079
+
+List activities: jq -C ".activity[].label" ~/.hh.cache.json
+List devices: jq -C ".device[].label" ~/.hh.cache.json
+List functions for activity zero: jq -C ".activity[0].controlGroup[].function[].name" ~/.hh.cache.json
+List functions for all activities: jq -C ".activity[] | .label, .controlGroup[].function[].name" ~/.hh.cache.json 
+List functions for all dactivities as pairs: jq -c -C ".activity[] | {"X":.label, "Y":.controlGroup[].function[].name }" ~/.hh.cache.json
+List functions formatted: jq -C '.activity[] | "---- " + .label + " ----", .controlGroup[].function[].name' ~/.hh.cache.json
