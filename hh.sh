@@ -108,6 +108,9 @@ case $1 in
 "off" )				### Turn off TV
 		send_command start_activity -1
 		;;
+"pause")			### Pause TIVO
+		send_command send_command --device tivo --command Pause
+		;;
 "py")				### Run generic pyharmony command
 		shift
 		if [ "$#" -eq 0 ]; then
