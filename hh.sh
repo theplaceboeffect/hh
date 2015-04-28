@@ -108,8 +108,13 @@ case $1 in
 "off" )				### Turn off TV
 		send_command start_activity -1
 		;;
+<<<<<<< HEAD:v2/hh.sh
 "on" )				### Turn on TV
 		send_command --device_id 13304282 --command PowerOn
+=======
+"pause")			### Pause TIVO
+		send_command send_command --device tivo --command Pause
+>>>>>>> 98b863070599b2d73e742376e91ad00ad3f8aefa:hh.sh
 		;;
 "py")				### Run generic pyharmony command
 		shift
@@ -119,14 +124,40 @@ case $1 in
 			send_command $*
 		fi
 		;;
-"info")		### Show available activities, devices and commands
+"info")				### Summar info
 		echo "---- Activities ---"
 		jq -c '.activity[] | { "id":.id, "label":.label}' $HH_CACHE
 		echo "---- Devices ---"
 		jq -c '.device[] | { "id":.id, "label":.label}' $HH_CACHE
 		;;
+"activities")		### Show available activities and commands
+		echo "---- Activities ---"
+		jq -c '.activity[] | { "id":.id, "label":.label}' $HH_CACHE
+		echo "---- Commands ----"
+		if [ "$2" == "" ]; then
+			jq -C '.activity[] |  "---- " + .label + " ----", .controlGroup[].function[].name' $HH_CACHE
+		else
+			jq -C '.activity[] | select(.label == "'$2'") | "---- " + .label + " ----", .controlGroup[].function[].name' $HH_CACHE
+		fi
+		;;
+"devices")			## Show devices and device commands
+		echo "---- Devices ---"
+		jq -c '.device[] | { "id":.id, "label":.label}' $HH_CACHE
+		if [ "$2" == "" ]; then
+			jq -C '.device[] |  "---- " + .label + " ----", .controlGroup[].function[].name' $HH_CACHE
+		else
+			jq -C '.device[] | select(.label == "'$2'") | "---- " + .label + " ----", .controlGroup[].function[].name' $HH_CACHE
+		fi
+		;;
+"send" )			### Send a command to device
+		send_command send_command --device $2 --command $3
+		;;
 "install" )			### Remove libraries and cache
-		ln -s $PWD/hh.sh ~/bin/hh
+		BIN_HH=~/bin/hh
+		echo "Installing ..."
+		/bin/rm -f $BIN_HH
+		ln -s $PWD/hh.sh $BIN_HH
+		ls -l $BIN_HH
 		;;
 "uninstall" )			### Remove libraries and cache
 		rm -frv $PYHARMONY_LIB ~/.hh.cache

@@ -1,2 +1,0 @@
-Start Xbox One: ./run_command.sh start_activity 13197995
-Start PS4: ./run_command.sh start_activity 13198079
