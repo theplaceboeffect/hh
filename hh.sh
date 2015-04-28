@@ -22,7 +22,7 @@ function get_pyharmony {
 
 #################################################
 ## Define function to send command to harmony hub
-function send_command {
+function send_harmony_command {
 	PYTHONPATH=$PYHARMONY_LIB python $PYHARMONY_LIB/harmony --loglevel CRITICAL\
 									 --email $HARMONY_EMAIL --password $HARMONY_PASSWORD\
 									 --harmony_ip  $HARMONY_IP --harmony_port 5222 $* ##2> /dev/null
@@ -31,7 +31,7 @@ function send_command {
 #################################################
 ## Cache functions
 function refresh_cache {
-	send_command show_config > $HH_CACHE
+	send_harmony_command show_config > $HH_CACHE
 }
 
 function update_cache {
@@ -84,44 +84,45 @@ case $1 in
 		grep '^".*)' $0
 		;;
 "current" | "c" )		### Show current activity
-		send_command show_current_activity | jq .label
+		send_harmony_command show_current_activity | jq .label
 		;;
 "refresh_cache" | "rc" )	### Refresh command cache
 		echo Refreshing cache
 		refresh_cache
 		;;
 "atv" )				### Apple TV
-		send_command start_activity 13198070
+		send_harmony_command start_activity 13198070
 		;;
 "mac" )				### macmini
-		send_command start_activity 13198039
+		send_harmony_command start_activity 13198039
 		;;
 "ps4" )				### PS4
-		send_command start_activity 13198079
+		send_harmony_command start_activity 13198079
 		;;
 "wiiu" )			### Wii U
-		send_command start_activity 
+		send_harmony_command start_activity 
 		;;
 "tv" | "xb1" )			### GAME - switch to XBox One & TV
-		send_command start_activity 13197995
+		send_harmony_command start_activity 13197995
 		;;
 "off" )				### Turn off TV
-		send_command start_activity -1
+		send_harmony_command start_activity -1
 		;;
-<<<<<<< HEAD:v2/hh.sh
 "on" )				### Turn on TV
-		send_command --device_id 13304282 --command PowerOn
-=======
+		send_harmony_command send_command --device_id 13304282 --command PowerOn
+		;;
 "pause")			### Pause TIVO
-		send_command send_command --device tivo --command Pause
->>>>>>> 98b863070599b2d73e742376e91ad00ad3f8aefa:hh.sh
+		send_harmony_command send_command --device tivo --command Pause
+		;;
+"play")			### Play TIVO
+		send_harmony_command send_command --device tivo --command Play
 		;;
 "py")				### Run generic pyharmony command
 		shift
 		if [ "$#" -eq 0 ]; then
-			send_command -h
+			send_harmony_command -h
 		else
-			send_command $*
+			send_harmony_command $*
 		fi
 		;;
 "info")				### Summar info
@@ -150,7 +151,7 @@ case $1 in
 		fi
 		;;
 "send" )			### Send a command to device
-		send_command send_command --device $2 --command $3
+		send_harmony_command send_command --device $2 --command $3
 		;;
 "install" )			### Remove libraries and cache
 		BIN_HH=~/bin/hh
@@ -164,5 +165,5 @@ case $1 in
 		rm -f ~/bin/hh
 		;;
 $*)	## Pass command to harmony
-		send_command $*
+		send_harmony_command $*
 esac
