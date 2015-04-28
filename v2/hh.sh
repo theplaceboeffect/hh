@@ -35,8 +35,8 @@ function refresh_cache {
 }
 
 function update_cache {
-	## Update cache if older than a day.
-	REFRESH_AFTER_EVERY_N_SECONDS=$(expr 60 \* 60 \* 24)
+	## Update cache if older than 7 days.
+	REFRESH_AFTER_EVERY_N_SECONDS=$(expr 60 \* 60 \* 24 \* 7)
 
 	if [ ! -f $HH_CACHE ]; then
 		DIFF=$REFRESH_AFTER_EVERY_N_SECONDS 
@@ -107,6 +107,9 @@ case $1 in
 		;;
 "off" )				### Turn off TV
 		send_command start_activity -1
+		;;
+"on" )				### Turn on TV
+		send_command --device_id 13304282 --command PowerOn
 		;;
 "py")				### Run generic pyharmony command
 		shift
